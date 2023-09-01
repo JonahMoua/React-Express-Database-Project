@@ -1,5 +1,3 @@
-// controllers.ts
-
 import { Request, Response } from 'express';
 import { User } from '../services/db'; // Import your User model
 
@@ -116,7 +114,7 @@ async function getPaginatedUsers(req: Request, res: Response) {
   }
 }
 
-export {
+export default{
   addUser,
   updateUser,
   deleteUser,
