@@ -21,8 +21,7 @@ function UserList() {
   const updatedUserData = {};
 
   useEffect(() => {
-    // Fetch user data based on pagination, sorting, and search term
-    axios.get(`/users?page=${page}&sortBy=${sortBy}&searchTerm=${searchTerm}`)
+    axios.get(`http://localhost:50000/users?page=1&pageSize=10`)
       .then((response) => {
         const { data, totalPages } = response.data;
         setUsers(data);
@@ -34,7 +33,9 @@ function UserList() {
   }, [page, sortBy, searchTerm]);
 
   const handlePageChange = (newPage) => {
-    setPage(newPage);
+    if (newPage >= 1) {
+      setPage(newPage);
+    }
   };
 
   const handleSortChange = (newSortBy) => {
