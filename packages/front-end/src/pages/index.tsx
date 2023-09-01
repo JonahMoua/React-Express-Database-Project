@@ -21,7 +21,7 @@ function UserList() {
   const updatedUserData = {};
 
   useEffect(() => {
-    axios.get(`http://localhost:50000/users?page=${page}&pageSize=10`)
+    axios.get(`http://localhost:50000/users?page=${page}&pageSize=10&searchTerm=${searchTerm}&sortBy=${sortBy}`)
       .then((response) => {
         const { data, totalPages } = response.data;
         setUsers(data);
