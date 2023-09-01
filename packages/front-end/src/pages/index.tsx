@@ -21,7 +21,7 @@ function UserList() {
   const updatedUserData = {};
 
   useEffect(() => {
-    axios.get(`http://localhost:50000/users?page=1&pageSize=10`)
+    axios.get(`http://localhost:50000/users?page=${page}&pageSize=10`)
       .then((response) => {
         const { data, totalPages } = response.data;
         setUsers(data);
@@ -33,9 +33,7 @@ function UserList() {
   }, [page, sortBy, searchTerm]);
 
   const handlePageChange = (newPage) => {
-    if (newPage >= 1) {
       setPage(newPage);
-    }
   };
 
   const handleSortChange = (newSortBy) => {
