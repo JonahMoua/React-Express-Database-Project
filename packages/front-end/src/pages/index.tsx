@@ -20,7 +20,7 @@ function UserList() {
   const [sortBy, setSortBy] = useState<string>('firstName');
   const [searchTerm, setSearchTerm] = useState<string>('');
   const [newUser, setNewUser] = useState<User>({
-    id: 0,
+    id : 0,
     registered: '',
     firstName: '',
     middleName: '',
@@ -30,7 +30,8 @@ function UserList() {
     address: '',
     adminNotes: ''
   });
-  const updatedUserData: Partial<User> = {};
+  const [editedUser, setEditedUser] = useState<User | null>(null); 
+  const [showEditForm, setShowEditForm] = useState<boolean>(false);
 
   useEffect(() => {
     axios.get(`http://localhost:50000/users?page=${page}&pageSize=10&searchTerm=${searchTerm}&sortBy=${sortBy}`)
@@ -78,14 +79,25 @@ function UserList() {
       });
   };
 
-  const handleEditUser = (userId: number, updatedUserData: Partial<User>) => {
-    axios.put(`http://localhost:50000/users/${userId}`, updatedUserData)
+  const handleEditUser = (user: User) => {
+    setEditedUser(user);
+    setShowEditForm(true);
+  };
+
+  const handleUpdateUser = () => {
+    if (!editedUser) {
+      console.error('Edited user is undefined.');
+      return;
+    }
+  
+    axios.put(`http://localhost:50000/users/${editedUser.id}`, editedUser)
       .then((response) => {
         const updatedUser = response.data.data as User;
         const updatedUsers = users.map((user) =>
-          user.id === userId ? updatedUser : user
+          user.id === updatedUser.id ? updatedUser : user
         );
         setUsers(updatedUsers);
+        setShowEditForm(false);
       })
       .catch((error) => {
         console.error('Error updating a user:', error);
@@ -135,7 +147,7 @@ function UserList() {
         {users.map((user) => (
           <li key={user.id}>
             {user.firstName} {user.lastName}
-            <button onClick={() => handleEditUser(user.id, updatedUserData)}>Edit</button>
+            <button onClick={() => handleEditUser(user)}>Edit</button>
             <button onClick={() => handleDeleteUser(user.id)}>Delete</button>
           </li>
         ))}
@@ -182,6 +194,30 @@ function UserList() {
         {/* Add other input fields for additional user properties */}
         <button type="button" onClick={handleAddUser}>Add User</button>
       </form>
+
+      {/* Edit User Form */}
+      {showEditForm && editedUser && (
+        <div>
+          <h2>Edit User</h2>
+          <form>
+            <input
+              type="text"
+              placeholder="First Name"
+              value={editedUser.firstName}
+              onChange={(e) => setEditedUser({ ...editedUser, firstName: e.target.value })}
+            />
+            <input
+              type="text"
+              placeholder="Last Name"
+              value={editedUser.lastName}
+              onChange={(e) => setEditedUser({ ...editedUser, lastName: e.target.value })}
+            />
+            {/* Add other input fields for editing user properties */}
+            <button type="button" onClick={handleUpdateUser}>Save</button>
+            <button type="button" onClick={() => setShowEditForm(false)}>Cancel</button>
+          </form>
+        </div>
+      )}
     </div>
   );
 }
