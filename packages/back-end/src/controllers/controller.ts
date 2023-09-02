@@ -20,25 +20,33 @@ async function addUser(req: Request, res: Response) {
   }
 }
 
-async function updateUser(req: Request, res: Response) {
+
+const updateUser = async (req, res) => {
   const userId = req.params.id;
-  const updatedUserData = req.body;
 
   try {
-    await User.update(updatedUserData, {
-      where: { id: userId },
-    });
-    res.json({
-      success: true,
-      message: 'User updated successfully',
-    });
+    const updatedUserDetails = await User.findByPk(userId);
+
+    if (updatedUserDetails) {
+      res.json({
+        success: true,
+        data: updatedUserDetails.toJSON(), 
+      });
+    } else {
+      res.status(404).json({
+        success: false,
+        message: 'User not found',
+      });
+    }
   } catch (err) {
     console.error('Failed to update user.', err);
     res.status(500).json({
       success: false,
     });
   }
-}
+};
+
+
 
 async function deleteUser(req: Request, res: Response) {
   const userId = req.params.id;

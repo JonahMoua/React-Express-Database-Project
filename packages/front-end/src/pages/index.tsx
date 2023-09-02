@@ -89,10 +89,10 @@ function UserList() {
       console.error('Edited user is undefined.');
       return;
     }
-  
-    axios.put(`http://localhost:50000/users/${editedUser.id}`, editedUser)
+    axios.put(`http://localhost:50000/users/${editedUser}`, editedUser) // Note the use of editedUser.id
       .then((response) => {
         const updatedUser = response.data.data as User;
+        console.log(editedUser.id)
         const updatedUsers = users.map((user) =>
           user.id === updatedUser.id ? updatedUser : user
         );
@@ -103,6 +103,7 @@ function UserList() {
         console.error('Error updating a user:', error);
       });
   };
+  
 
   const handleDeleteUser = (userId: number) => {
     axios.delete(`http://localhost:50000/users/${userId}`)
@@ -197,27 +198,27 @@ function UserList() {
 
       {/* Edit User Form */}
       {showEditForm && editedUser && (
-        <div>
-          <h2>Edit User</h2>
-          <form>
-            <input
-              type="text"
-              placeholder="First Name"
-              value={editedUser.firstName}
-              onChange={(e) => setEditedUser({ ...editedUser, firstName: e.target.value })}
-            />
-            <input
-              type="text"
-              placeholder="Last Name"
-              value={editedUser.lastName}
-              onChange={(e) => setEditedUser({ ...editedUser, lastName: e.target.value })}
-            />
-            {/* Add other input fields for editing user properties */}
-            <button type="button" onClick={handleUpdateUser}>Save</button>
-            <button type="button" onClick={() => setShowEditForm(false)}>Cancel</button>
-          </form>
-        </div>
-      )}
+  <div>
+    <h2>Edit User</h2>
+    <form>
+      <input
+        type="text"
+        placeholder="First Name"
+        value={editedUser.firstName}
+        onChange={(e) => setEditedUser({ ...editedUser, firstName: e.target.value })}
+      />
+      <input
+        type="text"
+        placeholder="Last Name"
+        value={editedUser.lastName}
+        onChange={(e) => setEditedUser({ ...editedUser, lastName: e.target.value })}
+      />
+      {/* Add other input fields for editing user properties */}
+      <button type="button" onClick={handleUpdateUser}>Save</button>
+      <button type="button" onClick={() => setShowEditForm(false)}>Cancel</button>
+    </form>
+  </div>
+)}
     </div>
   );
 }
