@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import IRoute from '../types/IRoute';
-import UsersController from '../cotrollers/controller'; 
+import UsersController from '../controllers/controller'; 
 
 const UsersRouter: IRoute = {
   route: '/users',

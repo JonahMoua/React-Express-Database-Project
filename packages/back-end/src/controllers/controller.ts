@@ -1,6 +1,8 @@
 import { Request, Response } from 'express';
 import { User } from '../services/db'; // Import your User model
 
+const { Op } = require('sequelize');
+
 async function addUser(req: Request, res: Response) {
   const userData = req.body;
 
@@ -52,24 +54,77 @@ async function deleteUser(req: Request, res: Response) {
   }
 }
 
-async function searchUsers(req: Request, res: Response) {
-  const searchTerm = req.query.q;
+async function searchUsers(req, res) {
+  const { q: searchTerm } = req.query;
 
   try {
     const searchResults = await User.findAll({
-      where: { firstName: { $like: `%${searchTerm}%` } }, // Adjust this query as per your database setup
+      where: {
+        [Op.or]: [
+          {
+            id: {
+              [Op.eq]: searchTerm,
+            },
+          },
+          {
+            registered: {
+              [Op.iLike]: `%${searchTerm}%`,
+            },
+          },
+          {
+            firstName: {
+              [Op.iLike]: `%${searchTerm}%`,
+            },
+          },
+          {
+            middleName: {
+              [Op.iLike]: `%${searchTerm}%`,
+            },
+          },
+          {
+            lastName: {
+              [Op.iLike]: `%${searchTerm}%`,
+            },
+          },
+          {
+            email: {
+              [Op.iLike]: `%${searchTerm}%`,
+            },
+          },
+          {
+            phoneNumber: {
+              [Op.iLike]: `%${searchTerm}%`,
+            },
+          },
+          {
+            address: {
+              [Op.iLike]: `%${searchTerm}%`,
+            },
+          },
+          {
+            adminNotes: {
+              [Op.iLike]: `%${searchTerm}%`,
+            },
+          },
+        ],
+      },
     });
+
     res.json({
       success: true,
-      data: searchResults,
+      data: {
+        results: searchResults
+      },
     });
   } catch (err) {
     console.error('Failed to search users.', err);
     res.status(500).json({
       success: false,
+      error: 'Internal server error',
     });
   }
 }
+
 
 async function sortUsers(req: Request, res: Response) {
   const sortByField = req.query.field as string;

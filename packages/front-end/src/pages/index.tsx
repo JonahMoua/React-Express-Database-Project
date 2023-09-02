@@ -1,13 +1,25 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, ChangeEvent, FormEvent } from 'react';
 import axios from 'axios';
 
+interface User {
+  id: number;
+  registered: string;
+  firstName: string;
+  middleName?: string;
+  lastName: string;
+  email: string;
+  phoneNumber?: string;
+  address?: string;
+  adminNotes?: string;
+}
+
 function UserList() {
-  const [users, setUsers] = useState([]);
-  const [page, setPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(1);
-  const [sortBy, setSortBy] = useState('firstName');
-  const [searchTerm, setSearchTerm] = useState('');
-  const [newUser, setNewUser] = useState({
+  const [users, setUsers] = useState<User[]>([]);
+  const [page, setPage] = useState<number>(1);
+  const [totalPages, setTotalPages] = useState<number>(1);
+  const [sortBy, setSortBy] = useState<string>('firstName');
+  const [searchTerm, setSearchTerm] = useState<string>('');
+  const [newUser, setNewUser] = useState<User>({
     id: 0,
     registered: '',
     firstName: '',
@@ -18,7 +30,7 @@ function UserList() {
     address: '',
     adminNotes: ''
   });
-  const updatedUserData = {};
+  const updatedUserData: Partial<User> = {};
 
   useEffect(() => {
     axios.get(`http://localhost:50000/users?page=${page}&pageSize=10&searchTerm=${searchTerm}&sortBy=${sortBy}`)
@@ -32,22 +44,22 @@ function UserList() {
       });
   }, [page, sortBy, searchTerm]);
 
-  const handlePageChange = (newPage) => {
-      setPage(newPage);
+  const handlePageChange = (newPage: number) => {
+    setPage(newPage);
   };
 
-  const handleSortChange = (newSortBy) => {
+  const handleSortChange = (newSortBy: string) => {
     setSortBy(newSortBy);
   };
 
-  const handleSearchChange = (newSearchTerm) => {
-    setSearchTerm(newSearchTerm);
+  const handleSearchChange = (e: ChangeEvent<HTMLInputElement>) => {
+    setSearchTerm(e.target.value);
   };
 
   const handleAddUser = () => {
-    axios.post('/users', newUser)
+    axios.post('http://localhost:50000/users', newUser)
       .then((response) => {
-        const newUser = response.data.data;
+        const newUser = response.data.data as User;
         setUsers([...users, newUser]);
         setNewUser({
           id: 0,
@@ -66,10 +78,10 @@ function UserList() {
       });
   };
 
-  const handleEditUser = (userId, updatedUserData) => {
-    axios.put(`/users/${userId}`, updatedUserData)
+  const handleEditUser = (userId: number, updatedUserData: Partial<User>) => {
+    axios.put(`http://localhost:50000/users/${userId}`, updatedUserData)
       .then((response) => {
-        const updatedUser = response.data.data;
+        const updatedUser = response.data.data as User;
         const updatedUsers = users.map((user) =>
           user.id === userId ? updatedUser : user
         );
@@ -78,10 +90,10 @@ function UserList() {
       .catch((error) => {
         console.error('Error updating a user:', error);
       });
-  };  
+  };
 
-  const handleDeleteUser = (userId) => {
-    axios.delete(`/users/${userId}`)
+  const handleDeleteUser = (userId: number) => {
+    axios.delete(`http://localhost:50000/users/${userId}`)
       .then(() => {
         const updatedUsers = users.filter((user) => user.id !== userId);
         setUsers(updatedUsers);
@@ -112,9 +124,9 @@ function UserList() {
       <div>
         <input
           type="text"
-          placeholder="Search by name"
+          placeholder="Search"
           value={searchTerm}
-          onChange={(e) => handleSearchChange(e.target.value)}
+          onChange={handleSearchChange}
         />
       </div>
 
