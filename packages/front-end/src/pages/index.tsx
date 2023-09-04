@@ -32,6 +32,7 @@ function UserList() {
   });
   const [editedUser, setEditedUser] = useState<User | null>(null); 
   const [showEditForm, setShowEditForm] = useState<boolean>(false);
+  const [showAddForm, setAddForm] = useState<boolean>(false);
 
   useEffect(() => {
     axios.get(`http://localhost:50000/users?page=${page}&pageSize=10&searchTerm=${searchTerm}&sortBy=${sortBy}`)
@@ -62,7 +63,6 @@ function UserList() {
     try {
       const response = await axios.post(`http://localhost:50000/users/`, newUser);
       const newUserAdded = response.data.data as User;
-      console.log(newUserAdded)
       setUsers([...users, newUserAdded]);
       setNewUser({
         id: 0,
@@ -86,6 +86,10 @@ function UserList() {
     setShowEditForm(true);
   };
 
+  const handleAddForm = (x: boolean) => {
+    setAddForm(x);
+  };
+
   const handleUpdateUser = async () => {
     try {
       if (!editedUser) {
@@ -94,10 +98,8 @@ function UserList() {
       }
   
       const response = await axios.put(`http://localhost:50000/users/${editedUser.id}`, editedUser);
-      console.log(editedUser)
       if (response.status === 200) {
         const updatedUser = response.data.data;
-        console.log(updatedUser)
         // Update the user in the state
         const updatedUsers = users.map((user) =>
           user.id === updatedUser.id ? updatedUser : user
@@ -181,9 +183,11 @@ function UserList() {
       </div>
 
       {/* Add User Form */}
-      <h2>Add User</h2>
+      <button onClick={() => handleAddForm(true)}>Add User</button>
+      <button onClick={() => handleAddForm(false)}>Cancel</button>
+      {showAddForm && (
+      
       <form>
-        
         
         <input
           type="text"
@@ -206,10 +210,12 @@ function UserList() {
         {/* Add other input fields for additional user properties */}
         <button type="button" onClick={handleAddUser}>Add User</button>
       </form>
+      )}
 
       {/* Edit User Form */}
       {showEditForm && editedUser && (
   <div>
+
     <h2>Edit User</h2>
     <form>
       

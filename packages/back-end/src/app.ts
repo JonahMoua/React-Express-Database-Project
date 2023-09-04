@@ -5,7 +5,7 @@ import { attachSequelize } from './middleware/db';
 import Cors from './middleware/cors'
 import IRoute from './types/IRoute';
 
-const bodyParser = require('body-parser');
+const bodyParser = require('body-parser'); //needed to npm install
 
 const appCfg = {
   port: parseInt(process.env.EXPRESS_PORT) || 50000,
@@ -14,7 +14,7 @@ const appCfg = {
 
 const app = express();
 
-// Attach any middleware
+// Attach any middleware added bodyParser to accept req.body 
 app.use(express.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
