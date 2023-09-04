@@ -5,6 +5,8 @@ import { attachSequelize } from './middleware/db';
 import Cors from './middleware/cors'
 import IRoute from './types/IRoute';
 
+const bodyParser = require('body-parser');
+
 const appCfg = {
   port: parseInt(process.env.EXPRESS_PORT) || 50000,
   hostname: process.env.EXPRESS_HOST ?? '127.0.0.1',
@@ -13,6 +15,9 @@ const appCfg = {
 const app = express();
 
 // Attach any middleware
+app.use(express.json());
+app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.json());
 app.use(Cors);
 app.use(attachSequelize);
 
@@ -51,4 +56,4 @@ function isFile(path: string): boolean {
   }
 }
 
-app.use(express.json());
+

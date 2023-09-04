@@ -28,7 +28,7 @@ const addUser = async (req: Request, res: Response) => {
 
 const updateUser = async (req: Request, res: Response) => {
   const userId = req.params.id;
-  const updatedUserData = req.body;
+  const updatedUserData = req.body; //this is prob the same error as adding
 
   try {
     const updatedUserDetails = await User.findOne({
