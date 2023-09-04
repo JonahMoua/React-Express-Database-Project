@@ -2,8 +2,8 @@ import React, { useEffect, useState, ChangeEvent, FormEvent } from 'react';
 import axios from 'axios';
 
 interface User {
-  id: number;
-  registered: string;
+  id?: number;
+  registered?: string;
   firstName: string;
   middleName?: string;
   lastName: string;
@@ -57,51 +57,60 @@ function UserList() {
     setSearchTerm(e.target.value);
   };
 
-  const handleAddUser = () => {
-    axios.post('http://localhost:50000/users', newUser)
-      .then((response) => {
-        const newUser = response.data.data as User;
-        setUsers([...users, newUser]);
-        setNewUser({
-          id: 0,
-          registered: '',
-          firstName: '',
-          middleName: '',
-          lastName: '',
-          email: '',
-          phoneNumber: '',
-          address: '',
-          adminNotes: ''
-        });
-      })
-      .catch((error) => {
-        console.error('Error adding a user:', error);
+  const handleAddUser = async () => {
+    console.log(newUser)
+    try {
+      const response = await axios.post(`http://localhost:50000/users/`, newUser);
+      const newUserAdded = response.data.data as User;
+      console.log(newUserAdded)
+      setUsers([...users, newUserAdded]);
+      setNewUser({
+        id: 0,
+        registered: '',
+        firstName: '',
+        middleName: '',
+        lastName: '',
+        email: '',
+        phoneNumber: '',
+        address: '',
+        adminNotes: '',
       });
+    } catch (error) {
+      console.error('Error adding a user:', error);
+    }
   };
+  
 
   const handleEditUser = (user: User) => {
     setEditedUser(user);
     setShowEditForm(true);
   };
 
-  const handleUpdateUser = () => {
-    if (!editedUser) {
-      console.error('Edited user is undefined.');
-      return;
-    }
-    axios.put(`http://localhost:50000/users/${editedUser}`, editedUser) // Note the use of editedUser.id
-      .then((response) => {
-        const updatedUser = response.data.data as User;
-        console.log(editedUser.id)
+  const handleUpdateUser = async () => {
+    try {
+      if (!editedUser) {
+        console.error('Edited user is undefined.');
+        return;
+      }
+  
+      const response = await axios.put(`http://localhost:50000/users/${editedUser.id}`, editedUser);
+      console.log(editedUser)
+      if (response.status === 200) {
+        const updatedUser = response.data.data;
+        console.log(updatedUser)
+        // Update the user in the state
         const updatedUsers = users.map((user) =>
           user.id === updatedUser.id ? updatedUser : user
         );
+  
         setUsers(updatedUsers);
         setShowEditForm(false);
-      })
-      .catch((error) => {
-        console.error('Error updating a user:', error);
-      });
+      } else {
+        console.error('Error updating a user:', response.statusText);
+      }
+    } catch (error) {
+      console.error('Error updating a user:', error);
+    }
   };
   
 
@@ -174,6 +183,8 @@ function UserList() {
       {/* Add User Form */}
       <h2>Add User</h2>
       <form>
+        
+        
         <input
           type="text"
           placeholder="First Name"
@@ -201,6 +212,7 @@ function UserList() {
   <div>
     <h2>Edit User</h2>
     <form>
+      
       <input
         type="text"
         placeholder="First Name"

@@ -1,18 +1,23 @@
 import { Request, Response } from 'express';
-import { User } from '../services/db'; // Import your User model
+import { User, sequelize } from '../services/db'; // Import your User model
+import { Model } from 'sequelize';
 
 const { Op } = require('sequelize');
 
-async function addUser(req: Request, res: Response) {
-  const userData = req.body;
+const addUser = async (req: Request, res: Response) => {
+  const userData = req.body
 
   try {
-    const newUser = await User.create(userData);
+
+    await User.create(userData)
+
+
     res.status(201).json({
       success: true,
-      data: newUser,
+      data: userData,
     });
-  } catch (err) {
+  } 
+  catch (err) {
     console.error('Failed to add a new user.', err);
     res.status(500).json({
       success: false,
@@ -21,16 +26,25 @@ async function addUser(req: Request, res: Response) {
 }
 
 
-const updateUser = async (req, res) => {
+const updateUser = async (req: Request, res: Response) => {
   const userId = req.params.id;
+  const updatedUserData = req.body;
 
   try {
-    const updatedUserDetails = await User.findByPk(userId);
+    const updatedUserDetails = await User.findOne({
+      where: { id: userId },
+    });
 
     if (updatedUserDetails) {
+  
+      updatedUserDetails.update(updatedUserData);
+
+      
+      await updatedUserDetails.save();
+
       res.json({
         success: true,
-        data: updatedUserDetails.toJSON(), 
+        data: updatedUserDetails,
       });
     } else {
       res.status(404).json({
@@ -38,7 +52,8 @@ const updateUser = async (req, res) => {
         message: 'User not found',
       });
     }
-  } catch (err) {
+  } 
+  catch (err) {
     console.error('Failed to update user.', err);
     res.status(500).json({
       success: false,
@@ -54,7 +69,8 @@ async function deleteUser(req: Request, res: Response) {
   try {
     await User.destroy({ where: { id: userId } });
     res.status(204).send();
-  } catch (err) {
+  } 
+  catch (err) {
     console.error('Failed to delete user.', err);
     res.status(500).json({
       success: false,

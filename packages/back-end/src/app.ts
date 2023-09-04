@@ -50,3 +50,5 @@ function isFile(path: string): boolean {
     return false;
   }
 }
+
+app.use(express.json());
