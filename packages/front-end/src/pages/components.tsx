@@ -2,8 +2,7 @@ import React from "react";
 import styled from 'styled-components';
 
 export const UserListContainer = styled.div `
-
-
+background: light-blue;
 `
 
 export const EditButton = styled.button `

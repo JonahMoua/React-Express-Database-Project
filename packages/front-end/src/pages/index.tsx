@@ -19,6 +19,9 @@ function UserList() {
   const [totalPages, setTotalPages] = useState<number>(1);
   const [sortBy, setSortBy] = useState<string>('firstName');
   const [searchTerm, setSearchTerm] = useState<string>('');
+  const [editedUser, setEditedUser] = useState<User | null>(null); 
+  const [showEditForm, setShowEditForm] = useState<boolean>(false);
+  const [showAddForm, setAddForm] = useState<boolean>(false);
   const [newUser, setNewUser] = useState<User>({
     id : 0,
     registered: '',
@@ -30,12 +33,9 @@ function UserList() {
     address: '',
     adminNotes: ''
   });
-  const [editedUser, setEditedUser] = useState<User | null>(null); 
-  const [showEditForm, setShowEditForm] = useState<boolean>(false);
-  const [showAddForm, setAddForm] = useState<boolean>(false);
 
   useEffect(() => {
-    axios.get(`http://localhost:50000/users?page=${page}&pageSize=10&searchTerm=${searchTerm}&sortBy=${sortBy}`)
+    axios.get(`http://localhost:50000/users?page=${page}&pageSize=10`)
       .then((response) => {
         const { data, totalPages } = response.data;
         setUsers(data);
@@ -50,16 +50,32 @@ function UserList() {
     setPage(newPage);
   };
 
-  const handleSortChange = (newSortBy: string) => {
-    setSortBy(newSortBy);
-  };
+  const handleSortBy = async (sort: string) => {
+    setSortBy(sort)
+    try {
+      const response = await axios.get(`http://localhost:50000/users/search?search=${sort}`)
+      const sortedTable = response.data.data
+      setUsers(sortedTable)
+    } catch (error) {
+      console.error('Error sorting:', error);
+    }
+  }
 
   const handleSearchChange = (e: ChangeEvent<HTMLInputElement>) => {
     setSearchTerm(e.target.value);
   };
 
+  // const HandleSearch = async () => {
+  //   try {
+  //     const response = await axios.get(`http://localhost:50000/users/search`)
+  //   }
+  // }
+
+  const handleAddForm = (x: boolean) => {
+    setAddForm(x);
+  };
+
   const handleAddUser = async () => {
-    console.log(newUser)
     try {
       const response = await axios.post(`http://localhost:50000/users/`, newUser);
       const newUserAdded = response.data.data as User;
@@ -86,10 +102,6 @@ function UserList() {
     setShowEditForm(true);
   };
 
-  const handleAddForm = (x: boolean) => {
-    setAddForm(x);
-  };
-
   const handleUpdateUser = async () => {
     try {
       if (!editedUser) {
@@ -100,7 +112,6 @@ function UserList() {
       const response = await axios.put(`http://localhost:50000/users/${editedUser.id}`, editedUser);
       if (response.status === 200) {
         const updatedUser = response.data.data;
-        // Update the user in the state
         const updatedUsers = users.map((user) =>
           user.id === updatedUser.id ? updatedUser : user
         );
@@ -134,7 +145,7 @@ function UserList() {
       {/* Sort by */}
       <div>
         <label>Sort by:</label>
-        <select onChange={(e) => handleSortChange(e.target.value)} value={sortBy}>
+        <select onChange={(e) => handleSortBy(e.target.value)} value={sortBy}>
           <option value="firstName">First Name</option>
           <option value="lastName">Last Name</option>
           <option value="email">Email</option>

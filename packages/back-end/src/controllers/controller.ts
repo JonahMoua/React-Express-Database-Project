@@ -11,7 +11,6 @@ const addUser = async (req: Request, res: Response) => {
 
     await User.create(userData)
 
-
     res.status(201).json({
       success: true,
       data: userData,
@@ -78,7 +77,7 @@ async function deleteUser(req: Request, res: Response) {
   }
 }
 
-async function searchUsers(req, res) {
+async function searchUsers(req: Request, res: Response) {
   const { q: searchTerm } = req.query;
 
   try {
